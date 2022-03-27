@@ -47,19 +47,18 @@ public class LoginActivity extends AppCompatActivity {
 
 
         bSignin.setOnClickListener(v -> {
-            mAuth.signInWithEmailAndPassword(tfEmail.toString(), tfPassword.toString())
+            mAuth.signInWithEmailAndPassword(tfEmail.getText().toString(), tfPassword.getText().toString())
                     .addOnCompleteListener(this, task -> {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
 //                            Log.d(TAG, "signInWithEmail:success");
                             FirebaseUser user = mAuth.getCurrentUser();
 //                            updateUI(user);
-                            message.setText("GOOD");
+                            message.setText("USER IN");
                         } else {
                             // If sign in fails, display a message to the user.
 //                            Log.w(TAG, "signInWithEmail:failure", task.getException());
-//                            Toast.makeText(login1.this, "Authentication failed.",
-//                                    Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(this, "Authentication failed", Toast.LENGTH_SHORT).show();
 //                            updateUI(null);
                             message.setText("BAD");
                         }
@@ -67,22 +66,22 @@ public class LoginActivity extends AppCompatActivity {
             });
         });
 
-//        bSignup.setOnClickListener(v -> {
-//            mAuth.createUserWithEmailAndPassword(tfEmail.toString(), tfPassword.toString())
-//                    .addOnCompleteListener(this, task -> {
-//                        if (task.isSuccessful()) {
-//                            // Sign in success, update UI with the signed-in user's information
+        bSignup.setOnClickListener(v -> {
+            mAuth.createUserWithEmailAndPassword(tfEmail.getText().toString(), tfPassword.getText().toString())
+                    .addOnCompleteListener(this, task -> {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
 //                            Log.d(TAG, "createUserWithEmail:success");
-//                            FirebaseUser user = mAuth.getCurrentUser();
+                            FirebaseUser user = mAuth.getCurrentUser();
 //                            updateUI(user);
-//                        } else {
-//                            // If sign in fails, display a message to the user.
-//                            Log.w(TAG, "createUserWithEmail:failure",
-//                                    task.getException());
-//                            Toast.makeText(login1.this, "Authentication failed.",
-//                                    Toast.LENGTH_SHORT).show();
+                            message.setText("USER CREATED");
+                        } else {
+                            // If sign in fails, display a message to the user.
+//                            Log.w(TAG, "createUserWithEmail:failure", task.getException());
+//                            Toast.makeText(this, "Authentication failed.", Toast.LENGTH_SHORT).show();
 //                            updateUI(null);
-//                        }});
-//        });
+                            message.setText("USER NOT NOT CREATED");
+                        }});
+        });
     }
 }
