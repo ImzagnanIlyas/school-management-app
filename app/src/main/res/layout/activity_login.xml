@@ -3,105 +3,92 @@
     xmlns:tools = "http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height = "match_parent"
     tools:context = ".LoginActivity">
-
-    <TextView android:text = "Login" android:layout_width="wrap_content"
-        android:layout_height = "wrap_content"
-        android:id = "@+id/textview"
-        android:textSize = "35dp"
-        android:layout_alignParentTop = "true"
-        android:layout_centerHorizontal = "true"
-        android:textColor="#000000"
-        android:fontFamily="sans-serif-medium"
-        />
-
+<!--    <TextView android:text = "Login" android:layout_width="wrap_content"-->
+<!--        android:layout_height = "wrap_content"-->
+<!--        android:id = "@+id/textview"-->
+<!--        android:textSize = "35dp"-->
+<!--        android:layout_alignParentTop = "true"-->
+<!--        android:layout_centerHorizontal = "true"-->
+<!--        android:textColor="#000000"-->
+<!--        android:fontFamily="sans-serif-medium"-->
+<!--        />-->
 
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/textview"
+        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="58dp"
         android:adjustViewBounds="true"
-        android:maxWidth="150dp"
-        android:maxHeight="150dp"
+        android:maxWidth="200dp"
+        android:maxHeight="200dp"
         android:scaleType="fitCenter"
         android:src="@drawable/logo" />
 
     <TextView
-        android:id="@+id/message"
+        android:text = "MIOLA Management"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/tfPassword"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
-        android:layout_marginStart="162dp"
-        android:layout_marginLeft="162dp"
-        android:layout_marginTop="1dp"
-        android:text="............"
-        android:textColor="#F41C0C"
-        android:textSize="25dp" />
+        android:layout_height = "wrap_content"
+        android:layout_below="@+id/imageView"
+        android:layout_marginTop="3dp"
+        android:textSize = "15dp"
+        android:layout_centerHorizontal = "true"
+        android:textColor="@color/red_700"
+        android:fontFamily="sans-serif-medium" />
+
+<!--    <TextView-->
+<!--        android:id="@+id/message"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_below="@+id/tfPassword"-->
+<!--        android:layout_alignParentStart="true"-->
+<!--        android:layout_alignParentLeft="true"-->
+<!--        android:layout_marginStart="162dp"-->
+<!--        android:layout_marginLeft="162dp"-->
+<!--        android:layout_marginTop="1dp"-->
+<!--        android:text="............"-->
+<!--        android:textColor="#F41C0C"-->
+<!--        android:textSize="25dp" />-->
 
     <EditText
         android:id="@+id/tfEmail"
-        android:layout_width="wrap_content"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_below="@+id/imageView"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginStart="1dp"
-        android:layout_marginLeft="1dp"
+        android:layout_centerHorizontal="true"
         android:layout_marginTop="94dp"
-        android:layout_marginEnd="-1dp"
-        android:layout_marginRight="-1dp"
         android:focusable="true"
-        android:hint="Enter Name"
-        android:textColorHighlight="#ff7eff15"
-        android:textColorHint="#03A9F4" />
+        android:hint="Email" />
 
     <EditText
         android:id="@+id/tfPassword"
-        android:layout_width="wrap_content"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_below="@+id/tfEmail"
-        android:layout_alignEnd="@+id/tfEmail"
-        android:layout_alignRight="@+id/tfEmail"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
-        android:layout_marginStart="1dp"
-        android:layout_marginLeft="1dp"
-        android:layout_marginTop="0dp"
-        android:layout_marginEnd="0dp"
-        android:layout_marginRight="0dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="5dp"
         android:ems="10"
         android:hint="Password"
-        android:inputType="textPassword"
-        android:textColorHint="#03A9F4" />
-
-    <Button
-        android:id="@+id/signup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="1dp"
-        android:layout_marginLeft="1dp"
-        android:layout_marginBottom="184dp"
-        android:layout_toEndOf="@+id/textview"
-        android:layout_toRightOf="@+id/textview"
-        android:text="Sign Up" />
+        android:inputType="textPassword" />
 
     <Button
         android:id="@+id/signin"
-        android:layout_width="wrap_content"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginEnd="2dp"
-        android:layout_marginRight="2dp"
-        android:layout_marginBottom="184dp"
-        android:layout_toStartOf="@+id/textview"
-        android:layout_toLeftOf="@+id/textview"
+        android:layout_below="@+id/tfPassword"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
         android:text="Sign In" />
+
+
+    <Button
+        android:id="@+id/signup"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/signin"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="80dp"
+        android:text="Sign Up" />
 
 </RelativeLayout>
