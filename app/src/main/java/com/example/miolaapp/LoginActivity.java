@@ -1,6 +1,8 @@
 package com.example.miolaapp;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -55,7 +57,7 @@ public class LoginActivity extends AppCompatActivity {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithEmail:success");
                             FirebaseUser user = mAuth.getCurrentUser();
-//                            updateUI(user);
+                            updateUI();
 //                            message.setText("USER IN");
                         } else {
                             // If sign in fails, display a message to the user.
@@ -85,5 +87,11 @@ public class LoginActivity extends AppCompatActivity {
 //                            message.setText("USER NOT NOT CREATED");
                         }});
         });
+    }
+
+    /** Called when the user authenticate */
+    public void updateUI() {
+        Intent intent = new Intent(this, ProfsListActivity.class);
+        startActivity(intent);
     }
 }
