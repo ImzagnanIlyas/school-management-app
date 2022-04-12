@@ -74,7 +74,7 @@ public class ProfAdapter extends RecyclerView.Adapter<ProfAdapter.ViewHolder> {
 
 //        // Reference to an image file in Cloud Storage
         StorageReference storageReference =
-                FirebaseStorage.getInstance().getReference(DIRECTORY+localDataSet.get(position).getId());
+                FirebaseStorage.getInstance().getReference(localDataSet.get(position).getImage());
 //        // Download directly from StorageReference using Glide
 //        // (See MyAppGlideModule for Loader registration)
         Glide.with(context)

@@ -1,16 +1,17 @@
 package com.example.miolaapp.entities;
 
 public class Professeur {
-    private String id;
     private String nom;
     private String prenom;
     private String email;
+    private String image;
 
-    public Professeur(String id, String nom, String prenom, String email) {
+
+    public Professeur(String nom, String prenom, String email, String image) {
         this.nom = nom;
         this.prenom = prenom;
         this.email = email;
-        this.id = id;
+        this.image = image;
     }
 
     public String getNom() {
@@ -37,21 +38,21 @@ public class Professeur {
         this.email = email;
     }
 
-    public String getId() {
-        return id;
+    public String getImage() {
+        return image;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setImage(String image) {
+        this.image = image;
     }
 
     @Override
     public String toString() {
         return "Professeur{" +
-                "id='" + id + '\'' +
-                ", nom='" + nom + '\'' +
+                "nom='" + nom + '\'' +
                 ", prenom='" + prenom + '\'' +
                 ", email='" + email + '\'' +
+                ", image='" + image + '\'' +
                 '}';
     }
 }
