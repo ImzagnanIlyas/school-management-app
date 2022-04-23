@@ -62,6 +62,7 @@ public class AddProfDialog extends DialogFragment {
                     public void onClick(DialogInterface dialog, int id) {
 //                        Toast.makeText(AddProfDialog.this.getContext(), "GOOD", Toast.LENGTH_SHORT).show();
                         saveProf();
+                        ((ProfsListActivity)AddProfDialog.this.getActivity()).refresh();
                     }
                 })
                 .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
@@ -73,7 +74,7 @@ public class AddProfDialog extends DialogFragment {
     }
 
     private void saveProf(){
-        // Showing progressDialog while uploading
+        // Showing progressDialog while saving
         ProgressDialog progressDialog
                 = new ProgressDialog(this.getContext());
         progressDialog.setMessage("Saving ...");

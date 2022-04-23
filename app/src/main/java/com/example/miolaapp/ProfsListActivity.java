@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -37,8 +38,8 @@ public class ProfsListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profs_list);
 
         Log.v(TAG, "HI ITS LIST");
-        System.out.println("HI ITS LIST");
 
+        db = FirebaseFirestore.getInstance();
         list = new ArrayList<>();
 
         // set up the RecyclerView
@@ -64,7 +65,11 @@ public class ProfsListActivity extends AppCompatActivity {
     @SuppressLint("NotifyDataSetChanged")
     private void getProfs(){
         Log.v(TAG, "GET PROFS");
-        db = FirebaseFirestore.getInstance(); // TODO move to construct
+        // Showing progressDialog while fetching
+        ProgressDialog progressDialog  = new ProgressDialog(this);
+        progressDialog.setMessage("Loading ...");
+        progressDialog.show();
+
         list.clear();
         db.collection("professeurs")
                 .get()
@@ -82,6 +87,11 @@ public class ProfsListActivity extends AppCompatActivity {
                     }
                     // Notifier l'adapter
                     adapter.notifyDataSetChanged();
+                    progressDialog.dismiss();
                 });
+    }
+
+    public void refresh(){
+        getProfs();
     }
 }
