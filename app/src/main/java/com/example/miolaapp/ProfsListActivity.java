@@ -13,6 +13,8 @@ import com.example.miolaapp.adapters.ProfAdapter;
 import com.example.miolaapp.entities.Professeur;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -27,6 +29,7 @@ public class ProfsListActivity extends AppCompatActivity {
 
     private ProfAdapter adapter;
     private RecyclerView recyclerView;
+    private ExtendedFloatingActionButton fabAdd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +37,7 @@ public class ProfsListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profs_list);
 
         Log.v(TAG, "HI ITS LIST");
+        System.out.println("HI ITS LIST");
 
         list = new ArrayList<>();
 
@@ -43,6 +47,12 @@ public class ProfsListActivity extends AppCompatActivity {
         recyclerView.setHasFixedSize(true);
         adapter = new ProfAdapter(this, list);
         recyclerView.setAdapter(adapter);
+
+        fabAdd = findViewById(R.id.fab_add);
+        fabAdd.setOnClickListener(view -> {
+            AddProfDialog addProfDialog = new AddProfDialog();
+            addProfDialog.show(getSupportFragmentManager(), "DIALOG");
+        });
     }
 
     @Override
@@ -54,7 +64,7 @@ public class ProfsListActivity extends AppCompatActivity {
     @SuppressLint("NotifyDataSetChanged")
     private void getProfs(){
         Log.v(TAG, "GET PROFS");
-        db = FirebaseFirestore.getInstance();
+        db = FirebaseFirestore.getInstance(); // TODO move to construct
         list.clear();
         db.collection("professeurs")
                 .get()
@@ -62,8 +72,8 @@ public class ProfsListActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         for (QueryDocumentSnapshot document : task.getResult()) {
 //                            Log.v(TAG, document.getId() + " => " + document.getData());
-//                            list.add(document.toObject(Professeur.class));
-                            list.add(new Professeur(document.getString("nom"), document.getString("prenom"), document.getString("email"), document.getString("image")));
+                            list.add(document.toObject(Professeur.class));
+//                            list.add(new Professeur(document.getString("nom"), document.getString("prenom"), document.getString("email"), document.getString("image")));
 //                            Log.v(TAG, document.toObject(Professeur.class).toString());
 //                            Log.v(TAG, new Professeur(document.get("id").toString(), document.get("nom").toString(), document.get("prenom").toString(), document.get("email").toString()).toString());
                         }
