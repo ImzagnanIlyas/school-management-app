@@ -3,6 +3,16 @@
     android:orientation="vertical"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
+
+    <android.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimaryVariant"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme"
+        android:title="New" />
+
     <EditText
         android:id="@+id/nom"
         android:layout_width="match_parent"
@@ -57,11 +67,10 @@
 
     <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/cord"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
+        android:layout_marginLeft="10dp"
         android:layout_marginBottom="16dp"
         android:text="Coordonnateur"/>
 
@@ -69,5 +78,7 @@
         android:id="@+id/btnSelect"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="25dp"
+        android:layout_marginRight="25dp"
         android:text="Select image" />
 </LinearLayout>
