@@ -3,9 +3,11 @@ package com.example.miolaapp.adapters;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
@@ -37,6 +39,7 @@ public class ProfAdapter extends RecyclerView.Adapter<ProfAdapter.ViewHolder> {
         final ShapeableImageView picture;
         final TextView name;
         final TextView email;
+        final TextView buttonViewOption;
 
         public ViewHolder(View view) {
             super(view);
@@ -44,6 +47,7 @@ public class ProfAdapter extends RecyclerView.Adapter<ProfAdapter.ViewHolder> {
             picture = view.findViewById(R.id.imageView_picture);
             name = view.findViewById(R.id.textView_name);
             email = view.findViewById(R.id.textView_email);
+            buttonViewOption = view.findViewById(R.id.textViewOptions);
 //            itemLayoutView.setOnClickListener(this);
         }
     }
@@ -83,6 +87,28 @@ public class ProfAdapter extends RecyclerView.Adapter<ProfAdapter.ViewHolder> {
         Glide.with(context)
                 .load(storageReference)
                 .into(viewHolder.picture);
+
+        // Set Popup Menu
+        viewHolder.buttonViewOption.setOnClickListener(view -> {
+            //creating a popup menu
+            PopupMenu popup = new PopupMenu(context, viewHolder.buttonViewOption);
+            //inflating menu from xml resource
+            popup.inflate(R.menu.popup_menu_items);
+            //adding click listener
+            popup.setOnMenuItemClickListener(item -> {
+                switch (item.getItemId()) {
+                    case R.id.edit:
+                        //handle menu1 click
+                        break;
+                    case R.id.delete:
+                        //handle menu2 click
+                        break;
+                }
+                return false;
+            });
+            //displaying the popup
+            popup.show();
+        });
     }
 
     // Return the size of your dataset (invoked by the layout manager)
@@ -90,4 +116,6 @@ public class ProfAdapter extends RecyclerView.Adapter<ProfAdapter.ViewHolder> {
     public int getItemCount() {
         return localDataSet.size();
     }
+
+
 }
