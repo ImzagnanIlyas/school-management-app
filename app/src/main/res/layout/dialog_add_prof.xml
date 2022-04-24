@@ -11,7 +11,7 @@
         android:background="?attr/colorPrimaryVariant"
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme"
-        android:title="New" />
+        android:title="Nouveau" />
 
     <EditText
         android:id="@+id/nom"

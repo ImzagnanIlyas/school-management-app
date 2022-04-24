@@ -18,6 +18,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import com.example.miolaapp.entities.Professeur;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -37,10 +38,13 @@ import java.util.UUID;
 
 public class AddProfDialog extends DialogFragment {
     private static final String TAG = "AddProfDialog";
+    private String ID; // for edit
+    private Professeur profToEdit;
 
     private EditText nom, prenom, email, tele, depart;
     private SwitchMaterial cord;
     private Button btnSelect;
+    private Toolbar toolbar;
 
     private Uri filePath; // Uri indicates, where the image will be picked from
     private String uuid;
@@ -80,6 +84,9 @@ public class AddProfDialog extends DialogFragment {
         depart = view.findViewById(R.id.depart);
         cord = view.findViewById(R.id.cord);
         btnSelect = view.findViewById(R.id.btnSelect);
+        toolbar = view.findViewById(R.id.toolbar);
+
+        if (isEdit()) fillData();
 
         // on pressing btnSelect SelectImage() is called
         btnSelect.setOnClickListener(v -> activity.selectImage());
@@ -120,6 +127,10 @@ public class AddProfDialog extends DialogFragment {
         boolean cord = this.cord.isChecked();
 
         Professeur prof = new Professeur(nom, prenom, email, tele, depart, cord, "prof-pictures/"+uuid);
+        if (isEdit()){
+            if (activity.filePath == null)
+                prof.setImage(profToEdit.getImage());
+        }
 
         db.collection("professeurs").document(email).set(prof)
                 .addOnCompleteListener(task -> {
@@ -137,8 +148,7 @@ public class AddProfDialog extends DialogFragment {
     }
 
     // UploadImage method
-    private void uploadImage(ProgressDialog progressDialog)
-    {
+    private void uploadImage(ProgressDialog progressDialog){
         filePath = activity.filePath;
         if (filePath != null) {
             // Defining the child of storageReference
@@ -157,6 +167,32 @@ public class AddProfDialog extends DialogFragment {
                     activity.refresh();
                 });
         }
+        activity.filePath = null;
+        progressDialog.dismiss();
+        activity.refresh();
+    }
+
+    public void edit(String id){
+        ID = id;
+    }
+
+    private boolean isEdit(){
+        return ID != null;
+    }
+
+    private void fillData(){
+        toolbar.setTitle("Modifier");
+        email.setEnabled(false);
+        db.collection("professeurs").document(ID).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    profToEdit = documentSnapshot.toObject(Professeur.class);
+                    nom.setText(profToEdit.getNom());
+                    prenom.setText(profToEdit.getPrenom());
+                    email.setText(profToEdit.getEmail());
+                    tele.setText(profToEdit.getTele());
+                    depart.setText(profToEdit.getDepart());
+                    cord.setChecked(profToEdit.isCord());
+                });
     }
 
 }

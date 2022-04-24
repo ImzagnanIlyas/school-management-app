@@ -10,9 +10,11 @@ import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.miolaapp.AddProfDialog;
 import com.example.miolaapp.R;
 import com.example.miolaapp.entities.Professeur;
 import com.example.miolaapp.utils.GlideApp;
@@ -27,7 +29,8 @@ public class ProfAdapter extends RecyclerView.Adapter<ProfAdapter.ViewHolder> {
 
     private static final String DIRECTORY = "prof-pictures/";
 
-    private Context context;
+//    private Context context;
+    private FragmentActivity fragmentActivity;
     private ArrayList<Professeur> localDataSet;
 
     /**
@@ -55,9 +58,13 @@ public class ProfAdapter extends RecyclerView.Adapter<ProfAdapter.ViewHolder> {
     /**
      * Initialize the dataset of the Adapter.
      */
-    public ProfAdapter(Context context, ArrayList<Professeur> dataSet) {
+//    public ProfAdapter(Context context, ArrayList<Professeur> dataSet) {
+//        localDataSet = dataSet;
+//        this.context = context;
+//    }
+    public ProfAdapter(FragmentActivity fragmentActivity, ArrayList<Professeur> dataSet) {
         localDataSet = dataSet;
-        this.context = context;
+        this.fragmentActivity = fragmentActivity;
     }
 
     // Create new views (invoked by the layout manager)
@@ -84,14 +91,14 @@ public class ProfAdapter extends RecyclerView.Adapter<ProfAdapter.ViewHolder> {
                 FirebaseStorage.getInstance().getReference(localDataSet.get(position).getImage());
 
         // Download directly from StorageReference using Glide
-        Glide.with(context)
+        Glide.with(fragmentActivity)
                 .load(storageReference)
                 .into(viewHolder.picture);
 
         // Set Popup Menu
         viewHolder.buttonViewOption.setOnClickListener(view -> {
             //creating a popup menu
-            PopupMenu popup = new PopupMenu(context, viewHolder.buttonViewOption);
+            PopupMenu popup = new PopupMenu(fragmentActivity, viewHolder.buttonViewOption);
             //inflating menu from xml resource
             popup.inflate(R.menu.popup_menu_items);
             //adding click listener
@@ -99,6 +106,7 @@ public class ProfAdapter extends RecyclerView.Adapter<ProfAdapter.ViewHolder> {
                 switch (item.getItemId()) {
                     case R.id.edit:
                         //handle menu1 click
+                        editProf(localDataSet.get(position).getEmail());
                         break;
                     case R.id.delete:
                         //handle menu2 click
@@ -117,5 +125,10 @@ public class ProfAdapter extends RecyclerView.Adapter<ProfAdapter.ViewHolder> {
         return localDataSet.size();
     }
 
+    private void editProf(String id){
+        AddProfDialog addProfDialog = new AddProfDialog();
+        addProfDialog.edit(id);
+        addProfDialog.show(fragmentActivity.getSupportFragmentManager(), "DIALOG");
+    }
 
 }

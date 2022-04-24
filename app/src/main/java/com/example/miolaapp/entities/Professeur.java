@@ -26,6 +26,15 @@ public class Professeur {
         this.image = image;
     }
 
+    public Professeur(String nom, String prenom, String email, String tele, String depart, boolean cord) {
+        this.nom = nom;
+        this.prenom = prenom;
+        this.email = email;
+        this.tele = tele;
+        this.depart = depart;
+        this.cord = cord;
+    }
+
     public String getNom() {
         return nom;
     }
