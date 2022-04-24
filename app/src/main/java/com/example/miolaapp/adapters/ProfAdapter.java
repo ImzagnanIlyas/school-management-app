@@ -14,10 +14,12 @@ import com.bumptech.glide.Glide;
 import com.example.miolaapp.R;
 import com.example.miolaapp.entities.Professeur;
 import com.example.miolaapp.utils.GlideApp;
+import com.google.android.material.imageview.ShapeableImageView;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class ProfAdapter extends RecyclerView.Adapter<ProfAdapter.ViewHolder> {
 
@@ -31,7 +33,8 @@ public class ProfAdapter extends RecyclerView.Adapter<ProfAdapter.ViewHolder> {
      * (custom ViewHolder).
      */
     public class ViewHolder extends RecyclerView.ViewHolder {
-        final ImageView picture;
+//        final ImageView picture;
+        final ShapeableImageView picture;
         final TextView name;
         final TextView email;
 
@@ -69,14 +72,14 @@ public class ProfAdapter extends RecyclerView.Adapter<ProfAdapter.ViewHolder> {
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
         // Get element from your dataset at this position and replace the
         // contents of the view with that element
-        viewHolder.name.setText(localDataSet.get(position).getNom()+" "+localDataSet.get(position).getPrenom());
-        viewHolder.email.setText(localDataSet.get(position).getEmail());
+        viewHolder.name.setText(localDataSet.get(position).getNom().toUpperCase(Locale.ROOT)+" "+localDataSet.get(position).getPrenom());
+        viewHolder.email.setText("Département "+localDataSet.get(position).getDepart());
 
-//        // Reference to an image file in Cloud Storage
+        // Reference to an image file in Cloud Storage
         StorageReference storageReference =
                 FirebaseStorage.getInstance().getReference(localDataSet.get(position).getImage());
-//        // Download directly from StorageReference using Glide
-//        // (See MyAppGlideModule for Loader registration)
+
+        // Download directly from StorageReference using Glide
         Glide.with(context)
                 .load(storageReference)
                 .into(viewHolder.picture);
