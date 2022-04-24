@@ -6,7 +6,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -31,6 +34,9 @@ public class ProfsListActivity extends AppCompatActivity {
     private ProfAdapter adapter;
     private RecyclerView recyclerView;
     private ExtendedFloatingActionButton fabAdd;
+
+    public Uri filePath; // Uri indicates, where the image will be picked from
+    private final int PICK_IMAGE_REQUEST = 22; // request code
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,5 +99,46 @@ public class ProfsListActivity extends AppCompatActivity {
 
     public void refresh(){
         getProfs();
+    }
+
+    // Select Image method
+    public void selectImage() {
+        System.out.println("SELECT PIC PIC");
+        // Defining Implicit Intent to mobile gallery
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(
+                Intent.createChooser(
+                        intent,
+                        "Select Image from here..."),
+                PICK_IMAGE_REQUEST);
+    }
+
+    // Override onActivityResult method
+    @Override
+    protected void onActivityResult(int requestCode,
+                                    int resultCode,
+                                    Intent data)
+    {
+
+        super.onActivityResult(requestCode,
+                resultCode,
+                data);
+
+        // checking request code and result code
+        // if request code is PICK_IMAGE_REQUEST and
+        // resultCode is RESULT_OK
+        // then set image in the image view
+        if (requestCode == PICK_IMAGE_REQUEST
+                && resultCode == Activity.RESULT_OK
+                && data != null
+                && data.getData() != null) {
+
+            // Get the Uri of data
+            filePath = data.getData();
+            System.out.println(filePath.toString());
+            System.out.println("PIC PIC");
+        }
     }
 }

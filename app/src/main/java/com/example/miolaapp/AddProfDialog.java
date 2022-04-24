@@ -3,10 +3,13 @@ package com.example.miolaapp;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,27 +20,49 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.miolaapp.entities.Professeur;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import java.util.UUID;
 
 public class AddProfDialog extends DialogFragment {
     private static final String TAG = "AddProfDialog";
 
     private EditText nom, prenom, email, tele, depart;
     private SwitchMaterial cord;
+    private Button btnSelect;
+
+    private Uri filePath; // Uri indicates, where the image will be picked from
+    private String uuid;
+    private final int PICK_IMAGE_REQUEST = 22; // request code
 
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
+    private FirebaseStorage storage;
+    private StorageReference storageReference;
+
+    private ProfsListActivity activity;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+        activity = ((ProfsListActivity)AddProfDialog.this.getActivity());
+
         FirebaseApp.initializeApp(this.getContext());
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
+        storage = FirebaseStorage.getInstance();
+        storageReference = storage.getReference();
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         // Get the layout inflater
@@ -54,6 +79,10 @@ public class AddProfDialog extends DialogFragment {
         tele = view.findViewById(R.id.tele);
         depart = view.findViewById(R.id.depart);
         cord = view.findViewById(R.id.cord);
+        btnSelect = view.findViewById(R.id.btnSelect);
+
+        // on pressing btnSelect SelectImage() is called
+        btnSelect.setOnClickListener(v -> activity.selectImage());
 
         builder.setView(view)
                 // Add action buttons
@@ -62,7 +91,6 @@ public class AddProfDialog extends DialogFragment {
                     public void onClick(DialogInterface dialog, int id) {
 //                        Toast.makeText(AddProfDialog.this.getContext(), "GOOD", Toast.LENGTH_SHORT).show();
                         saveProf();
-                        ((ProfsListActivity)AddProfDialog.this.getActivity()).refresh();
                     }
                 })
                 .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
@@ -74,6 +102,9 @@ public class AddProfDialog extends DialogFragment {
     }
 
     private void saveProf(){
+        // generate image filename
+        uuid = UUID.randomUUID().toString();
+
         // Showing progressDialog while saving
         ProgressDialog progressDialog
                 = new ProgressDialog(this.getContext());
@@ -88,19 +119,44 @@ public class AddProfDialog extends DialogFragment {
         String depart = this.depart.getText().toString();
         boolean cord = this.cord.isChecked();
 
-        Professeur prof = new Professeur(nom, prenom, email, tele, depart, cord, "prof-pictures/avatr.png");
+        Professeur prof = new Professeur(nom, prenom, email, tele, depart, cord, "prof-pictures/"+uuid);
 
         db.collection("professeurs").document(email).set(prof)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         mAuth.createUserWithEmailAndPassword(email, tele);
 //                        Toast.makeText(AddProfDialog.this.getContext(), "GOOD", Toast.LENGTH_SHORT).show();
+                        uploadImage(progressDialog);
                         Log.i(TAG, "SAVING GOOD");
                     } else {
 //                        Toast.makeText(AddProfDialog.this.getContext(), "BAD", Toast.LENGTH_SHORT).show();
                         Log.w(TAG, "SAVING ERROR", task.getException());
+                        progressDialog.dismiss();
                     }
-                    progressDialog.dismiss();
                 });
     }
+
+    // UploadImage method
+    private void uploadImage(ProgressDialog progressDialog)
+    {
+        filePath = activity.filePath;
+        if (filePath != null) {
+            // Defining the child of storageReference
+            StorageReference ref = storageReference.child("prof-pictures/"+ uuid);
+
+            ref.putFile(filePath)
+                .addOnSuccessListener(taskSnapshot -> {
+                    // Image uploaded successfully
+                    // Dismiss dialog
+                    progressDialog.dismiss();
+                    activity.refresh();
+                })
+                .addOnFailureListener(e -> {
+                    // Error, Image not uploaded
+                    progressDialog.dismiss();
+                    activity.refresh();
+                });
+        }
+    }
+
 }
