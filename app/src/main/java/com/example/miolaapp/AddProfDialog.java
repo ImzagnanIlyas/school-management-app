@@ -93,14 +93,14 @@ public class AddProfDialog extends DialogFragment {
 
         builder.setView(view)
                 // Add action buttons
-                .setPositiveButton("SAVE", new DialogInterface.OnClickListener() {
+                .setPositiveButton("SAUVEGARDER", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
 //                        Toast.makeText(AddProfDialog.this.getContext(), "GOOD", Toast.LENGTH_SHORT).show();
                         saveProf();
                     }
                 })
-                .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                .setNegativeButton("ANNULER", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         AddProfDialog.this.getDialog().cancel();
                     }
@@ -136,11 +136,11 @@ public class AddProfDialog extends DialogFragment {
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         mAuth.createUserWithEmailAndPassword(email, tele);
-//                        Toast.makeText(AddProfDialog.this.getContext(), "GOOD", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(activity, "Enregistré avec succès", Toast.LENGTH_SHORT).show();
                         uploadImage(progressDialog);
                         Log.i(TAG, "SAVING GOOD");
                     } else {
-//                        Toast.makeText(AddProfDialog.this.getContext(), "BAD", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(activity, "Echec de l'enregistrement", Toast.LENGTH_SHORT).show();
                         Log.w(TAG, "SAVING ERROR", task.getException());
                         progressDialog.dismiss();
                     }
@@ -166,10 +166,11 @@ public class AddProfDialog extends DialogFragment {
                     progressDialog.dismiss();
                     activity.refresh();
                 });
+        }else{
+            progressDialog.dismiss();
+            activity.refresh();
         }
         activity.filePath = null;
-        progressDialog.dismiss();
-        activity.refresh();
     }
 
     public void edit(String id){

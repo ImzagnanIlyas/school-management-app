@@ -1,7 +1,12 @@
 package com.example.miolaapp.adapters;
 
+import static android.content.ContentValues.TAG;
+
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -9,16 +14,22 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.miolaapp.AddProfDialog;
+import com.example.miolaapp.ProfsListActivity;
 import com.example.miolaapp.R;
 import com.example.miolaapp.entities.Professeur;
 import com.example.miolaapp.utils.GlideApp;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.imageview.ShapeableImageView;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -105,11 +116,10 @@ public class ProfAdapter extends RecyclerView.Adapter<ProfAdapter.ViewHolder> {
             popup.setOnMenuItemClickListener(item -> {
                 switch (item.getItemId()) {
                     case R.id.edit:
-                        //handle menu1 click
                         editProf(localDataSet.get(position).getEmail());
                         break;
                     case R.id.delete:
-                        //handle menu2 click
+                        confirmDeleteProf(localDataSet.get(position).getEmail());
                         break;
                 }
                 return false;
@@ -129,6 +139,30 @@ public class ProfAdapter extends RecyclerView.Adapter<ProfAdapter.ViewHolder> {
         AddProfDialog addProfDialog = new AddProfDialog();
         addProfDialog.edit(id);
         addProfDialog.show(fragmentActivity.getSupportFragmentManager(), "DIALOG");
+    }
+
+    private void confirmDeleteProf(String id){
+        new AlertDialog.Builder(fragmentActivity)
+                .setTitle("Suppression")
+                .setMessage("Voulez-vous vraiment supprimer ?")
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton(android.R.string.yes, (dialog, whichButton) -> deleteProf(id))
+                .setNegativeButton(android.R.string.no, null)
+                .show();
+    }
+
+    private void deleteProf(String id){
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("professeurs").document(id).delete()
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "DocumentSnapshot successfully deleted!");
+                    Toast.makeText(fragmentActivity, "Supprimé avec succès", Toast.LENGTH_SHORT).show();
+                    ((ProfsListActivity)fragmentActivity).refresh();
+                })
+                .addOnFailureListener(e -> {
+                    Log.w(TAG, "Error deleting document", e);
+                    Toast.makeText(fragmentActivity, "Erreur lors de la suppression", Toast.LENGTH_SHORT).show();
+                });
     }
 
 }
