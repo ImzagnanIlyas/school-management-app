@@ -24,6 +24,7 @@ import com.bumptech.glide.Glide;
 import com.example.miolaapp.AddProfDialog;
 import com.example.miolaapp.ProfsListActivity;
 import com.example.miolaapp.R;
+import com.example.miolaapp.ShowProfDialog;
 import com.example.miolaapp.entities.Professeur;
 import com.example.miolaapp.utils.GlideApp;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -54,6 +55,7 @@ public class ProfAdapter extends RecyclerView.Adapter<ProfAdapter.ViewHolder> {
         final TextView name;
         final TextView email;
         final TextView buttonViewOption;
+        final View root;
 
         public ViewHolder(View view) {
             super(view);
@@ -62,7 +64,7 @@ public class ProfAdapter extends RecyclerView.Adapter<ProfAdapter.ViewHolder> {
             name = view.findViewById(R.id.textView_name);
             email = view.findViewById(R.id.textView_email);
             buttonViewOption = view.findViewById(R.id.textViewOptions);
-//            itemLayoutView.setOnClickListener(this);
+            root = view.getRootView();
         }
     }
 
@@ -126,6 +128,13 @@ public class ProfAdapter extends RecyclerView.Adapter<ProfAdapter.ViewHolder> {
             });
             //displaying the popup
             popup.show();
+        });
+
+        // Set Show Dialog
+        viewHolder.root.setOnClickListener(view -> {
+            ShowProfDialog showProfDialog = new ShowProfDialog(localDataSet.get(position), viewHolder.picture.getDrawable());
+//            showProfDialog.fillData(localDataSet.get(position), viewHolder.picture.getDrawable());
+            showProfDialog.show(fragmentActivity.getSupportFragmentManager(), "SHOW-DIALOG");
         });
     }
 

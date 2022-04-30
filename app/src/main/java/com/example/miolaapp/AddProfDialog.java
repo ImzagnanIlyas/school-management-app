@@ -38,6 +38,8 @@ import java.util.UUID;
 
 public class AddProfDialog extends DialogFragment {
     private static final String TAG = "AddProfDialog";
+    private static final String DIR = "prof-pictures/";
+
     private String ID; // for edit
     private Professeur profToEdit;
 
@@ -126,7 +128,7 @@ public class AddProfDialog extends DialogFragment {
         String depart = this.depart.getText().toString();
         boolean cord = this.cord.isChecked();
 
-        Professeur prof = new Professeur(nom, prenom, email, tele, depart, cord, "prof-pictures/"+uuid);
+        Professeur prof = new Professeur(nom, prenom, email, tele, depart, cord, DIR+uuid);
         if (isEdit()){
             if (activity.filePath == null)
                 prof.setImage(profToEdit.getImage());
@@ -152,7 +154,7 @@ public class AddProfDialog extends DialogFragment {
         filePath = activity.filePath;
         if (filePath != null) {
             // Defining the child of storageReference
-            StorageReference ref = storageReference.child("prof-pictures/"+ uuid);
+            StorageReference ref = storageReference.child(DIR+uuid);
 
             ref.putFile(filePath)
                 .addOnSuccessListener(taskSnapshot -> {
