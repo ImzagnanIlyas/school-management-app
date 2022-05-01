@@ -93,7 +93,7 @@ public class LoginActivity extends AppCompatActivity {
 
     /** Called when the user authenticate */
     public void nextActivity() {
-        Intent intent = new Intent(this, ProfsListActivity.class);
+        Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
 
