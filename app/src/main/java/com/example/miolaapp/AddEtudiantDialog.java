@@ -1,14 +1,9 @@
 package com.example.miolaapp;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.DialogFragment;
-
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,35 +11,34 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
+import androidx.fragment.app.DialogFragment;
+
+import com.example.miolaapp.entities.Etudiant;
 import com.example.miolaapp.entities.Professeur;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 import java.util.UUID;
 
-public class AddProfDialog extends DialogFragment {
-    private static final String TAG = "AddProfDialog";
-    private static final String DIR = "prof-pictures/";
+/**
+ * This class for manage 'Etudiant' creation, it use the same XML file (dialog_add_prof.xml) with 'AddProfDialog'
+ * */
+public class AddEtudiantDialog extends DialogFragment {
+    private static final String TAG = "AddEtudiantDialog";
+    private static final String DIR = "etu-pictures/";
 
     private String ID; // for edit
-    private Professeur profToEdit;
+    private Etudiant instanceToEdit;
 
-    private EditText nom, prenom, email, tele, depart;
-    private SwitchMaterial cord;
+    private EditText nom, prenom, email, tele, filiere;
+    private SwitchMaterial cord; // element to hide
     private Button btnSelect;
     private Toolbar toolbar;
 
@@ -57,12 +51,12 @@ public class AddProfDialog extends DialogFragment {
     private FirebaseStorage storage;
     private StorageReference storageReference;
 
-    private ProfsListActivity activity;
+    private EtudiantsListActivity activity;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
-        activity = ((ProfsListActivity)AddProfDialog.this.getActivity());
+        activity = ((EtudiantsListActivity)AddEtudiantDialog.this.getActivity());
 
         FirebaseApp.initializeApp(this.getContext()); // TODO To remove whene Login is the main activity
         db = FirebaseFirestore.getInstance();
@@ -83,8 +77,8 @@ public class AddProfDialog extends DialogFragment {
         prenom = view.findViewById(R.id.prenom);
         email = view.findViewById(R.id.email);
         tele = view.findViewById(R.id.tele);
-        depart = view.findViewById(R.id.depart);
-        cord = view.findViewById(R.id.cord);
+        filiere = view.findViewById(R.id.depart); filiere.setHint("Filière"); // change placeholder
+        cord = view.findViewById(R.id.cord); cord.setVisibility(View.GONE); // remove element from the ui
         btnSelect = view.findViewById(R.id.btnSelect);
         toolbar = view.findViewById(R.id.toolbar);
 
@@ -99,18 +93,18 @@ public class AddProfDialog extends DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
 //                        Toast.makeText(AddProfDialog.this.getContext(), "GOOD", Toast.LENGTH_SHORT).show();
-                        saveProf();
+                        saveIstance();
                     }
                 })
                 .setNegativeButton("ANNULER", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        AddProfDialog.this.getDialog().cancel();
+                        AddEtudiantDialog.this.getDialog().cancel();
                     }
                 });
         return builder.create();
     }
 
-    private void saveProf(){
+    private void saveIstance(){
         // generate image filename
         uuid = UUID.randomUUID().toString();
 
@@ -125,22 +119,20 @@ public class AddProfDialog extends DialogFragment {
         String prenom = this.prenom.getText().toString();
         String email = this.email.getText().toString();
         String tele = this.tele.getText().toString();
-        String depart = this.depart.getText().toString();
-        boolean cord = this.cord.isChecked();
+        String filiere = this.filiere.getText().toString();
 
-        Professeur prof = new Professeur(nom, prenom, email, tele, depart, cord, DIR+uuid);
+        Etudiant instance = new Etudiant(nom, prenom, email, tele, filiere, DIR+uuid);
         if (isEdit()){
             if (activity.filePath == null)
-                prof.setImage(profToEdit.getImage());
+                instance.setImage(instanceToEdit.getImage());
         }
 
-        db.collection("professeurs").document(email).set(prof)
+        db.collection("etudiants").document(email).set(instance)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         mAuth.createUserWithEmailAndPassword(email, tele);
                         Toast.makeText(activity, "Enregistré avec succès", Toast.LENGTH_SHORT).show();
                         uploadImage(progressDialog);
-                        Log.i(TAG, "SAVING GOOD");
                     } else {
                         Toast.makeText(activity, "Echec de l'enregistrement", Toast.LENGTH_SHORT).show();
                         Log.w(TAG, "SAVING ERROR", task.getException());
@@ -157,17 +149,17 @@ public class AddProfDialog extends DialogFragment {
             StorageReference ref = storageReference.child(DIR+uuid);
 
             ref.putFile(filePath)
-                .addOnSuccessListener(taskSnapshot -> {
-                    // Image uploaded successfully
-                    // Dismiss dialog
-                    progressDialog.dismiss();
-                    activity.refresh();
-                })
-                .addOnFailureListener(e -> {
-                    // Error, Image not uploaded
-                    progressDialog.dismiss();
-                    activity.refresh();
-                });
+                    .addOnSuccessListener(taskSnapshot -> {
+                        // Image uploaded successfully
+                        // Dismiss dialog
+                        progressDialog.dismiss();
+                        activity.refresh();
+                    })
+                    .addOnFailureListener(e -> {
+                        // Error, Image not uploaded
+                        progressDialog.dismiss();
+                        activity.refresh();
+                    });
         }else{
             progressDialog.dismiss();
             activity.refresh();
@@ -175,27 +167,31 @@ public class AddProfDialog extends DialogFragment {
         activity.filePath = null;
     }
 
-    public void edit(String id){
-        ID = id;
+    public void edit(Etudiant obj){
+        instanceToEdit = obj;
     }
 
     private boolean isEdit(){
-        return ID != null;
+        return instanceToEdit != null;
     }
 
     private void fillData(){
         toolbar.setTitle("Modifier");
         email.setEnabled(false);
-        db.collection("professeurs").document(ID).get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    profToEdit = documentSnapshot.toObject(Professeur.class);
-                    nom.setText(profToEdit.getNom());
-                    prenom.setText(profToEdit.getPrenom());
-                    email.setText(profToEdit.getEmail());
-                    tele.setText(profToEdit.getTele());
-                    depart.setText(profToEdit.getDepart());
-                    cord.setChecked(profToEdit.isCord());
-                });
+        nom.setText(instanceToEdit.getNom());
+        prenom.setText(instanceToEdit.getPrenom());
+        email.setText(instanceToEdit.getEmail());
+        tele.setText(instanceToEdit.getTele());
+        filiere.setText(instanceToEdit.getFiliere());
+//        db.collection("etudiants").document(ID).get()
+//                .addOnSuccessListener(documentSnapshot -> {
+//                    instanceToEdit = documentSnapshot.toObject(Etudiant.class);
+//                    nom.setText(instanceToEdit.getNom());
+//                    prenom.setText(instanceToEdit.getPrenom());
+//                    email.setText(instanceToEdit.getEmail());
+//                    tele.setText(instanceToEdit.getTele());
+//                    filiere.setText(instanceToEdit.getFiliere());
+//                });
     }
 
 }
