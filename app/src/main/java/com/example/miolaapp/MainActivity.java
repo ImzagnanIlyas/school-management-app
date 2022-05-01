@@ -8,6 +8,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.miolaapp.adapters.ProfAdapter;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity {
     private Button btnListEtud, btnListProf, btnSignout;
@@ -31,6 +32,17 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        btnSignout.setOnClickListener(view -> finish());
+        btnSignout.setOnClickListener(view -> {
+            FirebaseAuth.getInstance().signOut();
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+            finish();
+        });
+    }
+
+    @Override
+    public void onBackPressed() {
+        // prevent going back to the login activity
+        moveTaskToBack(true);
     }
 }

@@ -38,6 +38,18 @@ public class LoginActivity extends AppCompatActivity {
     private EditText tfEmail,tfPassword;
 //    private TextView message;
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseApp.initializeApp(this);
+        mAuth = FirebaseAuth.getInstance();
+        USER = mAuth.getCurrentUser();
+        if (USER != null) {
+            nextActivity();
+            finish();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,11 +61,6 @@ public class LoginActivity extends AppCompatActivity {
         tfPassword = (EditText)findViewById(R.id.tfPassword);
 
         bSignup = (Button)findViewById(R.id.signup);
-
-        FirebaseApp.initializeApp(this);
-        mAuth = FirebaseAuth.getInstance();
-//        USER = mAuth.getCurrentUser();
-//        System.out.println("LOGGED USER : "+USER.toString());
 
         bSignin.setOnClickListener(v -> {
             mAuth.signInWithEmailAndPassword(tfEmail.getText().toString(), tfPassword.getText().toString())
