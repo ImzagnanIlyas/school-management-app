@@ -91,6 +91,10 @@ public class Professeur {
         this.cord = cord;
     }
 
+    public String getFullName(){
+        return nom+" "+prenom;
+    }
+
     @Override
     public String toString() {
         return "Professeur{" +

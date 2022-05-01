@@ -11,6 +11,8 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -35,15 +37,18 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
-public class ProfAdapter extends RecyclerView.Adapter<ProfAdapter.ViewHolder> {
+public class ProfAdapter extends RecyclerView.Adapter<ProfAdapter.ViewHolder> implements Filterable {
 
     private static final String DIRECTORY = "prof-pictures/";
 
 //    private Context context;
     private FragmentActivity fragmentActivity;
     private ArrayList<Professeur> localDataSet;
+    private ArrayList<Professeur> localDataSetFiltered;
 
     /**
      * Provide a reference to the type of views that you are using
@@ -77,6 +82,7 @@ public class ProfAdapter extends RecyclerView.Adapter<ProfAdapter.ViewHolder> {
 //    }
     public ProfAdapter(FragmentActivity fragmentActivity, ArrayList<Professeur> dataSet) {
         localDataSet = dataSet;
+        localDataSetFiltered = dataSet;
         this.fragmentActivity = fragmentActivity;
     }
 
@@ -96,12 +102,12 @@ public class ProfAdapter extends RecyclerView.Adapter<ProfAdapter.ViewHolder> {
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
         // Get element from your dataset at this position and replace the
         // contents of the view with that element
-        viewHolder.name.setText(localDataSet.get(position).getNom().toUpperCase(Locale.ROOT)+" "+localDataSet.get(position).getPrenom());
-        viewHolder.email.setText("Département "+localDataSet.get(position).getDepart());
+        viewHolder.name.setText(localDataSetFiltered.get(position).getNom().toUpperCase(Locale.ROOT)+" "+localDataSetFiltered.get(position).getPrenom());
+        viewHolder.email.setText("Département "+localDataSetFiltered.get(position).getDepart());
 
         // Reference to an image file in Cloud Storage
         StorageReference storageReference =
-                FirebaseStorage.getInstance().getReference(localDataSet.get(position).getImage());
+                FirebaseStorage.getInstance().getReference(localDataSetFiltered.get(position).getImage());
 
         // Download directly from StorageReference using Glide
         Glide.with(fragmentActivity)
@@ -118,10 +124,10 @@ public class ProfAdapter extends RecyclerView.Adapter<ProfAdapter.ViewHolder> {
             popup.setOnMenuItemClickListener(item -> {
                 switch (item.getItemId()) {
                     case R.id.edit:
-                        editProf(localDataSet.get(position).getEmail());
+                        editProf(localDataSetFiltered.get(position).getEmail());
                         break;
                     case R.id.delete:
-                        confirmDeleteProf(localDataSet.get(position).getEmail());
+                        confirmDeleteProf(localDataSetFiltered.get(position).getEmail());
                         break;
                 }
                 return false;
@@ -132,8 +138,8 @@ public class ProfAdapter extends RecyclerView.Adapter<ProfAdapter.ViewHolder> {
 
         // Set Show Dialog
         viewHolder.root.setOnClickListener(view -> {
-            ShowProfDialog showProfDialog = new ShowProfDialog(localDataSet.get(position), viewHolder.picture.getDrawable());
-//            showProfDialog.fillData(localDataSet.get(position), viewHolder.picture.getDrawable());
+            ShowProfDialog showProfDialog = new ShowProfDialog(localDataSetFiltered.get(position), viewHolder.picture.getDrawable());
+//            showProfDialog.fillData(localDataSetFiltered.get(position), viewHolder.picture.getDrawable());
             showProfDialog.show(fragmentActivity.getSupportFragmentManager(), "SHOW-DIALOG");
         });
     }
@@ -141,13 +147,46 @@ public class ProfAdapter extends RecyclerView.Adapter<ProfAdapter.ViewHolder> {
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        return localDataSet.size();
+        return localDataSetFiltered.size();
     }
 
     private void editProf(String id){
         AddProfDialog addProfDialog = new AddProfDialog();
         addProfDialog.edit(id);
         addProfDialog.show(fragmentActivity.getSupportFragmentManager(), "DIALOG");
+    }
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence charSequence) {
+                String charString = charSequence.toString();
+                if (charString.isEmpty()) {
+                    localDataSetFiltered = localDataSet;
+                } else {
+                    ArrayList<Professeur> filteredList = new ArrayList<>();
+                    for (Professeur row : localDataSet) {
+                        if (row.getFullName().toLowerCase().contains(charString.toLowerCase())) {
+                            filteredList.add(row);
+                        }
+                    }
+
+                    localDataSetFiltered = filteredList;
+                }
+
+                FilterResults filterResults = new FilterResults();
+                filterResults.values = localDataSetFiltered;
+                return filterResults;
+            }
+
+            @SuppressLint("NotifyDataSetChanged")
+            @Override
+            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+                localDataSetFiltered = (ArrayList<Professeur>) filterResults.values;
+                notifyDataSetChanged();
+            }
+        };
     }
 
     private void confirmDeleteProf(String id){
