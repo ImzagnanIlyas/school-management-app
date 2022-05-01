@@ -63,7 +63,6 @@ public class AddEtudiantDialog extends DialogFragment {
 
         activity = ((EtudiantsListActivity)AddEtudiantDialog.this.getActivity());
 
-        FirebaseApp.initializeApp(this.getContext()); // TODO To remove whene Login is the main activity
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
         storage = FirebaseStorage.getInstance();

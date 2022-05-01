@@ -14,18 +14,24 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.miolaapp.entities.Professeur;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import android.os.Bundle;
 
 public class LoginActivity extends AppCompatActivity {
 
     private static final String TAG = "LoginActivity";
+    public static FirebaseUser USER;
+    public static boolean IS_NOT_CORD = true;
 
     private FirebaseAuth mAuth;
     private Button bSignin,bSignup;
@@ -43,12 +49,11 @@ public class LoginActivity extends AppCompatActivity {
         tfPassword = (EditText)findViewById(R.id.tfPassword);
 
         bSignup = (Button)findViewById(R.id.signup);
-//        message = (TextView)findViewById(R.id.message);
-//        message.setVisibility(View.GONE);
 
         FirebaseApp.initializeApp(this);
         mAuth = FirebaseAuth.getInstance();
-
+//        USER = mAuth.getCurrentUser();
+//        System.out.println("LOGGED USER : "+USER.toString());
 
         bSignin.setOnClickListener(v -> {
             mAuth.signInWithEmailAndPassword(tfEmail.getText().toString(), tfPassword.getText().toString())
@@ -56,15 +61,12 @@ public class LoginActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
+                            USER = mAuth.getCurrentUser();
                             updateUI();
 //                            message.setText("USER IN");
                         } else {
                             // If sign in fails, display a message to the user.
-//                            Log.w(TAG, "signInWithEmail:failure", task.getException());
                             Toast.makeText(this, "Authentication failed", Toast.LENGTH_SHORT).show();
-//                            updateUI(null);
-//                            message.setText("BAD");
                         }
 
             });
@@ -76,7 +78,7 @@ public class LoginActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "createUserWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
+                            USER = mAuth.getCurrentUser();
 //                            updateUI(user);
 //                            message.setText("USER CREATED");
                         } else {
@@ -90,8 +92,23 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     /** Called when the user authenticate */
-    public void updateUI() {
+    public void nextActivity() {
         Intent intent = new Intent(this, ProfsListActivity.class);
         startActivity(intent);
+    }
+
+    private void updateUI(){
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference docRef = db.collection("professeurs").document(USER.getEmail());
+        docRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    Professeur prof = document.toObject(Professeur.class);
+                    IS_NOT_CORD = !prof.isCord();
+                }
+            }
+            nextActivity();
+        });
     }
 }

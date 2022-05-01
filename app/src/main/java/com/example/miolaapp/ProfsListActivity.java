@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.SearchView;
 
 import com.example.miolaapp.adapters.ProfAdapter;
@@ -58,7 +59,7 @@ public class ProfsListActivity extends AppCompatActivity {
 
         // toolbar fancy stuff
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Prof List");
+        getSupportActionBar().setTitle("Liste des professeurs");
 
         db = FirebaseFirestore.getInstance();
         list = new ArrayList<>();
@@ -75,6 +76,7 @@ public class ProfsListActivity extends AppCompatActivity {
             AddProfDialog addProfDialog = new AddProfDialog();
             addProfDialog.show(getSupportFragmentManager(), "DIALOG");
         });
+        if (LoginActivity.IS_NOT_CORD) fabAdd.setVisibility(View.GONE);
     }
 
     @Override
@@ -88,7 +90,7 @@ public class ProfsListActivity extends AppCompatActivity {
         Log.v(TAG, "GET PROFS");
         // Showing progressDialog while fetching
         ProgressDialog progressDialog  = new ProgressDialog(this);
-        progressDialog.setMessage("Loading ...");
+        progressDialog.setMessage("Chargement ...");
         progressDialog.show();
 
         list.clear();

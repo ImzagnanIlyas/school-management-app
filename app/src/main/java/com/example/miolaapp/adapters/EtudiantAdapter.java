@@ -21,6 +21,7 @@ import com.bumptech.glide.Glide;
 import com.example.miolaapp.AddEtudiantDialog;
 import com.example.miolaapp.AddProfDialog;
 import com.example.miolaapp.EtudiantsListActivity;
+import com.example.miolaapp.LoginActivity;
 import com.example.miolaapp.ProfsListActivity;
 import com.example.miolaapp.R;
 import com.example.miolaapp.ShowProfDialog;
@@ -59,6 +60,7 @@ public class EtudiantAdapter extends RecyclerView.Adapter<EtudiantAdapter.ViewHo
             name = view.findViewById(R.id.textView_name);
             email = view.findViewById(R.id.textView_email);
             buttonViewOption = view.findViewById(R.id.textViewOptions);
+            if (LoginActivity.IS_NOT_CORD) buttonViewOption.setVisibility(View.GONE);
             root = view.getRootView();
         }
     }

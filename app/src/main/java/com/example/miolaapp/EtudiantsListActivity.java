@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.SearchView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -72,6 +73,7 @@ public class EtudiantsListActivity extends AppCompatActivity {
             AddEtudiantDialog dialog = new AddEtudiantDialog();
             dialog.show(getSupportFragmentManager(), "ADD-DIALOG");
         });
+        if (LoginActivity.IS_NOT_CORD) fabAdd.setVisibility(View.GONE);
     }
 
     @Override
@@ -84,7 +86,7 @@ public class EtudiantsListActivity extends AppCompatActivity {
     private void fetchData(){
         // Showing progressDialog while fetching
         ProgressDialog progressDialog  = new ProgressDialog(this);
-        progressDialog.setMessage("Loading ...");
+        progressDialog.setMessage("Chargement ...");
         progressDialog.show();
 
         list.clear();
