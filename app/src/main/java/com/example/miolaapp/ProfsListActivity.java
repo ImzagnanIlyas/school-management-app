@@ -199,6 +199,10 @@ public class ProfsListActivity extends AppCompatActivity {
         if (id == R.id.action_search) {
             return true;
         }
+        if (id == android.R.id.home) {
+            this.finish();
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
     }
