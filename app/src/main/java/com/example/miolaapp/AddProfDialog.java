@@ -1,5 +1,6 @@
 package com.example.miolaapp;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 
@@ -21,12 +22,16 @@ import android.widget.Toast;
 import android.widget.Toolbar;
 
 import com.example.miolaapp.entities.Professeur;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.storage.FirebaseStorage;
@@ -98,7 +103,6 @@ public class AddProfDialog extends DialogFragment {
                 .setPositiveButton("SAUVEGARDER", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-//                        Toast.makeText(AddProfDialog.this.getContext(), "GOOD", Toast.LENGTH_SHORT).show();
                         saveProf();
                     }
                 })
@@ -114,11 +118,6 @@ public class AddProfDialog extends DialogFragment {
         // generate image filename
         uuid = UUID.randomUUID().toString();
 
-        // Showing progressDialog while saving
-        ProgressDialog progressDialog
-                = new ProgressDialog(this.getContext());
-        progressDialog.setMessage("Saving ...");
-        progressDialog.show();
 
         // Data
         String nom = this.nom.getText().toString();
@@ -134,19 +133,49 @@ public class AddProfDialog extends DialogFragment {
                 prof.setImage(profToEdit.getImage());
         }
 
-        db.collection("professeurs").document(email).set(prof)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        mAuth.createUserWithEmailAndPassword(email, tele);
-                        Toast.makeText(activity, "Enregistré avec succès", Toast.LENGTH_SHORT).show();
-                        uploadImage(progressDialog);
-                        Log.i(TAG, "SAVING GOOD");
-                    } else {
-                        Toast.makeText(activity, "Echec de l'enregistrement", Toast.LENGTH_SHORT).show();
-                        Log.w(TAG, "SAVING ERROR", task.getException());
-                        progressDialog.dismiss();
-                    }
-                });
+        DocumentReference docRef = db.collection("professeurs").document("email");
+        docRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    Toast.makeText(activity, "Professeur existe déjà", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Showing progressDialog while saving
+                    ProgressDialog progressDialog = new ProgressDialog(activity);
+                    progressDialog.setMessage("Enregistrement ...");
+                    progressDialog.show();
+                    docRef.set(prof)
+                            .addOnCompleteListener(savingTask -> {
+                                if (savingTask.isSuccessful()) {
+                                    mAuth.createUserWithEmailAndPassword(email, tele);
+                                    uploadImage(progressDialog);
+                                    Log.i(TAG, "SAVING GOOD");
+                                } else {
+                                    Toast.makeText(activity, "Echec de l'enregistrement", Toast.LENGTH_SHORT).show();
+                                    Log.w(TAG, "SAVING ERROR", savingTask.getException());
+                                    progressDialog.dismiss();
+                                }
+                            });
+                    Log.d(TAG, "No such document");
+                }
+            } else {
+                Log.d(TAG, "get failed with ", task.getException());
+            }
+        });
+
+//        db.collection("professeurs").document(email).set(prof)
+//                .addOnCompleteListener(task -> {
+//                    if (task.isSuccessful()) {
+//                        mAuth.createUserWithEmailAndPassword(email, tele);
+//                        Toast.makeText(activity, "Enregistré avec succès", Toast.LENGTH_SHORT).show();
+//                        uploadImage(progressDialog);
+//                        Log.i(TAG, "SAVING GOOD");
+//                    } else {
+//                        Toast.makeText(activity, "Echec de l'enregistrement", Toast.LENGTH_SHORT).show();
+//                        Log.w(TAG, "SAVING ERROR", task.getException());
+//                        progressDialog.dismiss();
+//                    }
+//                });
     }
 
     // UploadImage method
@@ -160,6 +189,7 @@ public class AddProfDialog extends DialogFragment {
                 .addOnSuccessListener(taskSnapshot -> {
                     // Image uploaded successfully
                     // Dismiss dialog
+                    Toast.makeText(activity, "Enregistré avec succès", Toast.LENGTH_SHORT).show();
                     progressDialog.dismiss();
                     activity.refresh();
                 })

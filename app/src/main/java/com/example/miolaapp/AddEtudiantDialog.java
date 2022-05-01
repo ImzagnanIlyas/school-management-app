@@ -14,13 +14,18 @@ import android.widget.EditText;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 
 import com.example.miolaapp.entities.Etudiant;
 import com.example.miolaapp.entities.Professeur;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -92,7 +97,6 @@ public class AddEtudiantDialog extends DialogFragment {
                 .setPositiveButton("SAUVEGARDER", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-//                        Toast.makeText(AddProfDialog.this.getContext(), "GOOD", Toast.LENGTH_SHORT).show();
                         saveIstance();
                     }
                 })
@@ -108,12 +112,6 @@ public class AddEtudiantDialog extends DialogFragment {
         // generate image filename
         uuid = UUID.randomUUID().toString();
 
-        // Showing progressDialog while saving
-        ProgressDialog progressDialog
-                = new ProgressDialog(this.getContext());
-        progressDialog.setMessage("Saving ...");
-        progressDialog.show();
-
         // Data
         String nom = this.nom.getText().toString();
         String prenom = this.prenom.getText().toString();
@@ -127,18 +125,47 @@ public class AddEtudiantDialog extends DialogFragment {
                 instance.setImage(instanceToEdit.getImage());
         }
 
-        db.collection("etudiants").document(email).set(instance)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        mAuth.createUserWithEmailAndPassword(email, tele);
-                        Toast.makeText(activity, "Enregistré avec succès", Toast.LENGTH_SHORT).show();
-                        uploadImage(progressDialog);
-                    } else {
-                        Toast.makeText(activity, "Echec de l'enregistrement", Toast.LENGTH_SHORT).show();
-                        Log.w(TAG, "SAVING ERROR", task.getException());
-                        progressDialog.dismiss();
-                    }
-                });
+        DocumentReference docRef = db.collection("etudiants").document(email);
+        docRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    Toast.makeText(activity, "Etudiant existe déjà", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Showing progressDialog while saving
+                    ProgressDialog progressDialog = new ProgressDialog(activity);
+                    progressDialog.setMessage("Enregistrement ...");
+                    progressDialog.show();
+                    docRef.set(instance)
+                            .addOnCompleteListener(savingTask -> {
+                                if (savingTask.isSuccessful()) {
+                                    mAuth.createUserWithEmailAndPassword(email, tele);
+                                    uploadImage(progressDialog);
+                                } else {
+                                    Toast.makeText(activity, "Echec de l'enregistrement", Toast.LENGTH_SHORT).show();
+                                    Log.w(TAG, "SAVING ERROR", savingTask.getException());
+                                    progressDialog.dismiss();
+                                }
+                            });
+                }
+            } else {
+                Log.d(TAG, "get failed with ", task.getException());
+            }
+        });
+
+
+//        db.collection("etudiants").document(email).set(instance)
+//                .addOnCompleteListener(task -> {
+//                    if (task.isSuccessful()) {
+//                        mAuth.createUserWithEmailAndPassword(email, tele);
+//                        Toast.makeText(activity, "Enregistré avec succès", Toast.LENGTH_SHORT).show();
+//                        uploadImage(progressDialog);
+//                    } else {
+//                        Toast.makeText(activity, "Echec de l'enregistrement", Toast.LENGTH_SHORT).show();
+//                        Log.w(TAG, "SAVING ERROR", task.getException());
+//                        progressDialog.dismiss();
+//                    }
+//                });
     }
 
     // UploadImage method
@@ -152,6 +179,7 @@ public class AddEtudiantDialog extends DialogFragment {
                     .addOnSuccessListener(taskSnapshot -> {
                         // Image uploaded successfully
                         // Dismiss dialog
+                        Toast.makeText(activity, "Enregistré avec succès", Toast.LENGTH_SHORT).show();
                         progressDialog.dismiss();
                         activity.refresh();
                     })
@@ -183,15 +211,6 @@ public class AddEtudiantDialog extends DialogFragment {
         email.setText(instanceToEdit.getEmail());
         tele.setText(instanceToEdit.getTele());
         filiere.setText(instanceToEdit.getFiliere());
-//        db.collection("etudiants").document(ID).get()
-//                .addOnSuccessListener(documentSnapshot -> {
-//                    instanceToEdit = documentSnapshot.toObject(Etudiant.class);
-//                    nom.setText(instanceToEdit.getNom());
-//                    prenom.setText(instanceToEdit.getPrenom());
-//                    email.setText(instanceToEdit.getEmail());
-//                    tele.setText(instanceToEdit.getTele());
-//                    filiere.setText(instanceToEdit.getFiliere());
-//                });
     }
 
 }
