@@ -132,7 +132,7 @@ public class AddProfDialog extends DialogFragment {
                 prof.setImage(profToEdit.getImage());
         }
 
-        DocumentReference docRef = db.collection("professeurs").document("email");
+        DocumentReference docRef = db.collection("professeurs").document(email);
         docRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
