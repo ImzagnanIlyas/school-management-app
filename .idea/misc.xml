@@ -9,13 +9,15 @@
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_main2.xml" value="0.23854166666666668" />
-        <entry key="app/src/main/res/layout/activity_profs_list.xml" value="0.23854166666666668" />
-        <entry key="app/src/main/res/layout/dialog_add_prof.xml" value="0.25" />
-        <entry key="app/src/main/res/layout/dialog_show_prof.xml" value="0.23854166666666668" />
+        <entry key="app/src/main/res/layout/activity_profs_list.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/activity_view_emploi.xml" value="0.23854166666666668" />
+        <entry key="app/src/main/res/layout/dialog_add_prof.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/dialog_show_prof.xml" value="0.33" />
         <entry key="app/src/main/res/layout/layout_popup_menu_items.xml" value="0.23854166666666668" />
         <entry key="app/src/main/res/layout/prof_item_layout.xml" value="0.33" />
         <entry key="app/src/main/res/layout/searchable.xml" value="0.23854166666666668" />
         <entry key="app/src/main/res/menu/menu_search.xml" value="0.23854166666666668" />
+        <entry key="app/src/main/res/menu/menu_update.xml" value="0.23854166666666668" />
         <entry key="app/src/main/res/menu/popup_menu_items.xml" value="0.23854166666666668" />
       </map>
     </option>

@@ -38,6 +38,17 @@
             android:text="La liste des professeurs" />
 
         <Button
+            android:id="@+id/button_view_emploi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:adjustViewBounds="true"
+            android:backgroundTint="@color/deep_orange_700"
+            android:drawableTop="@drawable/prof"
+            android:padding="10dp"
+            android:text="Emploi du temps" />
+
+        <Button
             android:id="@+id/button_signout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

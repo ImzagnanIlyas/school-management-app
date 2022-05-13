@@ -11,7 +11,7 @@ import com.example.miolaapp.adapters.ProfAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity {
-    private Button btnListEtud, btnListProf, btnSignout;
+    private Button btnListEtud, btnListProf, btnViewEmploi, btnSignout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
 
         btnListEtud = findViewById(R.id.button_list_etud);
         btnListProf = findViewById(R.id.button_list_prof);
+        btnViewEmploi = findViewById(R.id.button_view_emploi);
         btnSignout = findViewById(R.id.button_signout);
 
         btnListEtud.setOnClickListener(view -> {
@@ -29,6 +30,11 @@ public class MainActivity extends AppCompatActivity {
 
         btnListProf.setOnClickListener(view -> {
             Intent intent = new Intent(this, ProfsListActivity.class);
+            startActivity(intent);
+        });
+
+        btnViewEmploi.setOnClickListener(view -> {
+            Intent intent = new Intent(this, ViewEmploiActivity.class);
             startActivity(intent);
         });
 
